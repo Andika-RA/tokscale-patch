@@ -1738,6 +1738,10 @@ const SHARED_PARSER_FAMILIES: &[SharedParserFamily] = &[
             // +1 more: billed operations, as for Pi.
             (ClientId::Omp, 2),
             (ClientId::Senpi, 2),
+            // Deep AI Code delegates to the same parser with the standard
+            // cross-session dedup lane, so it starts at the current family
+            // offset. Its own cache identity keeps entries separate from Pi's.
+            (ClientId::DeepAi, 2),
             (ClientId::Proma, 0),
             // +3 for Prime Agent's independent history. v1->v2 strips a
             // leading BOM and recovers records containing undecodable
@@ -2275,6 +2279,7 @@ fn parser_version(client: ClientId) -> u32 {
         | ClientId::Kimchi
         | ClientId::Omp
         | ClientId::Senpi
+        | ClientId::DeepAi
         | ClientId::PrimeAgent
         | ClientId::Proma
         | ClientId::RooCode

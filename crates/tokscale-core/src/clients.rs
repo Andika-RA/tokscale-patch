@@ -1155,6 +1155,22 @@ define_clients!(
         headless: false,
         parse_local: true,
         submit_default: true
+    },
+    // Deep AI Code (Electron desktop harness) embeds the Pi coding agent and
+    // writes the same session JSONL record layout, so parsing delegates to the
+    // shared Pi format parser. It keeps its own client id and scan root so its
+    // usage is never folded into the standalone Pi CLI (`~/.pi/agent/sessions`)
+    // or any other Pi descendant; messages keep their recorded provider.
+    DeepAi = 60 => {
+        id: "deepai",
+        display: "Deep AI Code",
+        logo: None,
+        root: PathRoot::Home,
+        relative: ".deepai-code/userdata/deepai/pi/deepai/sessions",
+        pattern: "*.jsonl",
+        headless: false,
+        parse_local: true,
+        submit_default: false
     }
 );
 

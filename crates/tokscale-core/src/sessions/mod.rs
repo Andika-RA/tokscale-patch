@@ -22,6 +22,7 @@ pub mod copilot_session_store;
 pub mod copilot_vscode;
 pub mod crush;
 pub mod cursor;
+pub mod deepai;
 pub mod devin;
 pub mod droid;
 pub mod dsh;

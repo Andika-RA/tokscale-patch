@@ -4163,6 +4163,20 @@ fn parse_all_messages_streaming<S: MessageSink>(
         sessions::pi::parse_pi_file,
     );
 
+    // Deep AI Code embeds the Pi coding agent and reuses its record layout, so
+    // it shares the Pi parser (and its cross-session dedup) but keeps a distinct
+    // client id and scan root: a Deep AI Code run is never merged with a Pi CLI
+    // run, and both can be filtered independently with `-c deepai` / `-c pi`.
+    parse_cached_lane_deduped(
+        &scan_result,
+        &mut source_cache,
+        pricing,
+        &mut all_messages,
+        &machine_labeler,
+        ClientId::DeepAi,
+        sessions::deepai::parse_deepai_file,
+    );
+
     let prime_agent_outcomes: Vec<(
         CachedParseOutcome,
         sessions::prime_agent::PrimeFileAccounting,
@@ -8043,6 +8057,26 @@ pub fn parse_local_clients(options: LocalParseOptions) -> Result<ParsedMessages,
     let pi_count = pi_msgs.len() as i32;
     counts.set(ClientId::Pi, pi_count);
     messages.extend(pi_msgs);
+
+    // Deep AI Code writes the Pi record format, so it reuses the Pi parser and
+    // the same cross-session dedup. It keeps its own client id and scan root so
+    // its rows never collapse against a Pi CLI transcript (and vice versa).
+    let deepai_msgs_raw: Vec<UnifiedMessage> = scan_result
+        .get(ClientId::DeepAi)
+        .par_iter()
+        .flat_map(|path| sessions::deepai::parse_deepai_file(path))
+        .collect();
+    let mut deepai_seen: HashSet<String> = HashSet::new();
+    let deepai_msgs: Vec<ParsedMessage> = deepai_msgs_raw
+        .into_iter()
+        .filter(|message| should_keep_deduped_message(&mut deepai_seen, message))
+        .map(|message| unified_to_parsed(&message))
+        .collect();
+    counts.set(
+        ClientId::DeepAi,
+        i32::try_from(deepai_msgs.len()).unwrap_or(i32::MAX),
+    );
+    messages.extend(deepai_msgs);
 
     let prime_agent_files: Vec<(
         Vec<UnifiedMessage>,
