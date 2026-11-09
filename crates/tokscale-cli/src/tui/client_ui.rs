@@ -85,6 +85,9 @@ pub const CLIENT_UI: [ClientUi; ClientId::COUNT] = [
     // BB: both cases of `b` are taken (`b` and `B`), `s` is the global
     // "sources" picker binding, so `Z` takes the next available slot.
     ClientUi { hotkey: 'Z' },
+    // Deep AI Code: lowercase `d` belongs to Droid, so uppercase `D` keeps the
+    // "Deep" mnemonic without shadowing an existing client.
+    ClientUi { hotkey: 'D' },
 ];
 
 pub fn display_name(client: ClientId) -> &'static str {

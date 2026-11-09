@@ -1240,6 +1240,8 @@ pub enum ClientFilter {
     Proma,
     Bb,
     Synthetic,
+    #[value(name = "deepai")]
+    DeepAi,
 }
 
 impl ClientFilter {
@@ -1310,6 +1312,7 @@ impl ClientFilter {
             Self::Proma => "proma",
             Self::Bb => "bb",
             Self::Synthetic => "synthetic",
+            Self::DeepAi => "deepai",
         }
     }
 
@@ -1383,6 +1386,7 @@ impl ClientFilter {
             Self::Proma => Some(ClientId::Proma),
             Self::Bb => Some(ClientId::Bb),
             Self::Synthetic => None,
+            Self::DeepAi => Some(ClientId::DeepAi),
         }
     }
 
@@ -1451,6 +1455,7 @@ impl ClientFilter {
             ClientId::Vibe => Self::Vibe,
             ClientId::Proma => Self::Proma,
             ClientId::Bb => Self::Bb,
+            ClientId::DeepAi => Self::DeepAi,
         }
     }
 
